@@ -3,6 +3,8 @@ This is a maze generator/game. The user can choose the width/height of the maze,
 
 I still want to implement many things, such as multiple different algorthms to generate the maze, along with solving it.
 
+This was made for Windows and will (almost certainly) only run on windows. 
+
 Controls:
 - w - moves upward
 - a - move left
