@@ -4,10 +4,10 @@ This is a maze generator/game. The user can choose the width/height of the maze,
 I still want to implement many things, such as multiple different algorthms to generate the maze, along with solving it.
 
 Controls:
-w - moves upward
-a - move left
-s - move down
-d - move right
-h - displays the full maze
-p - solves the maze
-q - quit
+- w - moves upward
+- a - move left
+- s - move down
+- d - move right
+- h - displays the full maze
+- p - solves the maze
+- q - quit
