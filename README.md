@@ -5,6 +5,8 @@ I still want to implement many things, such as multiple different algorthms to g
 
 This was made for Windows and will (almost certainly) only run on windows. 
 
+Use the setup.exe and MazeGameSetup.msi to install the game and play.
+
 Controls:
 - w - moves upward
 - a - move left
