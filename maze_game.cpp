@@ -183,40 +183,6 @@ void getValidSpaces(vector<vector<int>>& validSpaces, char** maze, int SIZEX, in
 	}
 }
 
-// Determine if the current user position is in a 'junction'
-// A junction is defined as having more than 3 or more ways of moving from the given position
-// Dead ends can be thought of as junctions with one entrance
-bool isJunction(char** maze, int userX, int userY)
-{
-	int numberOfExits = 0;
-	if (maze[userY + 1][userX] == ' ')
-		numberOfExits++;
-	if (maze[userY - 1][userX] == ' ')
-		numberOfExits++;
-	if (maze[userY][userX + 1] == ' ')
-		numberOfExits++;
-	if (maze[userY][userX - 1] == ' ')
-		numberOfExits++;
-
-	if (numberOfExits <= 2)
-		return false;
-	return true;
-}
-
-// Determine if the current user position is at an entrance
-// An entrance is defined as a position just AFTER a junction
-bool isEntrance(char** maze, int userX, int userY)
-{
-	return true;
-}
-
-// Determine if the current user position is in a 'passage'
-// A Passage is defined as having an entrance at both ends.
-bool isPassage(char** maze, int userX, int userY)
-{
-	return true;
-}
-
 int getDX(char direction)
 {
 	switch (direction)
@@ -275,79 +241,26 @@ bool allPassagesUnmarked(char** maze, int userX, int userY)
 	return false;
 }
 
-// TODO: Implement this
-void mazeSolverTremaux(char** maze, int SIZEX, int SIZEY, int userX, int userY)
+// Determine if the current user position is in a 'junction'
+// A junction is defined as having more than 3 or more ways of moving from the given position
+// Dead ends can be thought of as junctions with one entrance
+bool isJunction(char** maze, int userX, int userY)
 {
-	// Univisted is ' '
-	// Marked once is '1'
-	// Marked twice is '2'
-	// Junction is marked '*'
+	int numberOfExits = 0;
+	if (maze[userY + 1][userX] == ' ' || maze[userY + 1][userX] == '1')
+		numberOfExits++;
+	if (maze[userY - 1][userX] == ' ' || maze[userY - 1][userX] == '1')
+		numberOfExits++;
+	if (maze[userY][userX + 1] == ' ' || maze[userY][userX + 1] == '1')
+		numberOfExits++;
+	if (maze[userY][userX - 1] == ' ' || maze[userY][userX - 1] == '1')
+		numberOfExits++;
 
-
-	// Algorithm Rules:
-	// 1. Whenever you pass through an entrance of a passage, whether it is to enter or exit a junction, leave a mark at the entrance as you pass
-	// 2. When you are at a junction, use the first applicable rule below to pick an entrance to exit through:
-	// 2a: If only the entrance you just came from is marked, pick an arbitrary unmarked entrance, if any.
-	//     This rule also applied if you're just starting in the middle of the mze and there are no marked entrances at all
-	// 2b: Pick the entrance you just came from, unless it is marked twice. This rule will apply whenver you reach a dead end.
-	// 2c: Pick any entrance with the fewest marks (zero if possible, else one)
-
-	char dir[5] = { 'N', 'E', 'S', 'W' };
-	char currentDir = 'N';
-	int dx = getDX(currentDir), dy = getDY(currentDir);
-
-	maze[userY][userX] = '1';
-
-	while (maze[userY][userX] != '$')
-	{
-		if (isJunction(maze, userX, userY))
-		{
-			// Place marker behind me
-			if (maze[userY - dy][userX - dx] == '1')
-				maze[userY - dy][userX - dx] = '2';
-			else if (maze[userY - dy][userX - dx] == ' ')
-				maze[userY - dy][userX - dx] = '1';
-
-			if (allPassagesUnmarked(maze, userX, userY))
-			{
-				do
-				{
-					currentDir = dir[rand() % 4];
-					dx = getDX(currentDir);
-					dy = getDY(currentDir);
-				} while (!isMovementAllowed(maze, userX + dx, userY + dy));
-			}
-			else if (maze[userY - dy][userX - dx] == '1') // need to see if behind me only has 1 mark
-			{
-				if (currentDir == 'N') { currentDir = 'S'; }
-				else if (currentDir == 'E') { currentDir = 'W'; }
-				else if (currentDir == 'S') { currentDir = 'N'; }
-				else { currentDir = 'E'; }
-				maze[userY + dy][userX + dx] = '2';
-			}
-			else if (maze[userY - dy][userX - dx] == '2') // If the path behind me has 2 marks, go along any other path with fewer marks (aka, any path)
-			{
-				do
-				{
-
-				} while (maze[userY][userX] != '2' && maze[userY][userX] != '#');
-			}
-			else
-			{
-				cout << "Maze solver broke." << endl;
-				return;
-			}
-		}
-
-		dx = getDX(currentDir);
-		dy = getDY(currentDir);
-
-		// move forward
-
-		userX += dx;
-		userY += dy;
-	}
+	if (numberOfExits <= 2)
+		return false;
+	return true;
 }
+
 
 bool isDeadEnd(char** maze, int x, int y)
 {
@@ -366,6 +279,20 @@ bool isDeadEnd(char** maze, int x, int y)
 	return false;
 }
 
+bool isNewPassage(char** maze, int x, int y)
+{
+	if (maze[y + 1][x] == ' ')
+		return true;
+	if (maze[y - 1][x] == ' ')
+		return true;
+	if (maze[y][x + 1] == ' ')
+		return true;
+	if (maze[y][x - 1] == ' ')
+		return true;
+
+	return false;
+}
+
 int numberOfExits(char** maze, int x, int y)
 {
 	int numberOfExits = 0;
@@ -378,6 +305,54 @@ int numberOfExits(char** maze, int x, int y)
 	if (maze[y][x - 1] == ' ' || maze[y][x - 1] == '.')
 		numberOfExits++;
 	return numberOfExits;
+}
+
+// TODO: Implement this
+void mazeSolverTremaux(char** maze, int SIZEX, int SIZEY, int userX, int userY, int goalX, int goalY)
+{
+	cout << "-------" << endl;
+	// Univisted is ' '
+	// Marked once is '1'
+	// Marked twice is '2'
+	// Junction is '*'
+
+	char dir[5] = { 'N', 'E', 'S', 'W' };
+	char currentDir = 'N';
+	int dx = getDX(currentDir), dy = getDY(currentDir);
+
+	
+
+	while (maze[userY][userX] != '$')
+	{
+		cout << "userX: " << userX << ", userY: " << userY << ", isJunction: " << isJunction(maze, userX, userY) << ", isDeadEnd: " << isDeadEnd(maze, userX, userY) << endl;
+
+		if (isJunction(maze, userX, userY))
+			maze[userY][userX] = '*';
+		else if (maze[userY][userX] == ' ')
+			maze[userY][userX] = '1';
+		else if (maze[userY][userX] == '1')
+			maze[userY][userX] == '2';
+
+
+
+		//cout << "userX: " << userX << ", userY: " << userY << ", dx: " << dx << ", dy: " << dy << endl;
+		
+		// move forward
+		userX += dx;
+		userY += dy;
+
+		//cout << "userX: " << userX << ", userY: " << userY << ", dx: " << dx << ", dy: " << dy << endl;
+		
+		// Debug information
+		/*
+		displayMaze(maze, SIZEX, SIZEY, userX, userY, goalX, goalY, 5000000);
+		cout << "userX: " << userX << ", userY: " << userY << endl;
+		cout << "currentDir: " << currentDir << endl;
+		cout << "current user position: " << maze[userY][userX] << endl;
+		cout << "--------" << endl;
+		Sleep(1000);
+		*/
+	}
 }
 
 bool isBend(char** maze, int x, int y, char currentDir)
@@ -692,6 +667,13 @@ int main()
 				for (int j = 0; j < SIZEX; j++)
 					if (maze[i][j] == '.')
 						maze[i][j] = ' ';
+			break;
+
+		case 'o':
+			mazeSolverTremaux(maze, SIZEX, SIZEY, userX, userY, goalX, goalY);
+			cout << "-----------------------------" << endl;
+			cout << "The solved maze is below." << endl;
+			displayMaze(maze, SIZEX, SIZEY);
 			break;
 
 		default:
