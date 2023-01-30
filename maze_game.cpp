@@ -227,33 +227,19 @@ int getDY(char direction)
 	}
 }
 
-bool allPassagesUnmarked(char** maze, int userX, int userY)
-{
-	char marks[3] = { '1', '2' };
-	for (int i = 0; i < 2; i++)
-	{
-		if (maze[userY - 1][userX] != marks[i])
-			if (maze[userY + 1][userX] != marks[i])
-				if (maze[userY][userX - 1] != marks[i])
-					if (maze[userY][userX + 1] != marks[i])
-						return true;
-	}
-	return false;
-}
-
 // Determine if the current user position is in a 'junction'
 // A junction is defined as having more than 3 or more ways of moving from the given position
 // Dead ends can be thought of as junctions with one entrance
 bool isJunction(char** maze, int userX, int userY)
 {
 	int numberOfExits = 0;
-	if (maze[userY + 1][userX] == ' ' || maze[userY + 1][userX] == '1')
+	if (maze[userY + 1][userX] == ' ')
 		numberOfExits++;
-	if (maze[userY - 1][userX] == ' ' || maze[userY - 1][userX] == '1')
+	if (maze[userY - 1][userX] == ' ')
 		numberOfExits++;
-	if (maze[userY][userX + 1] == ' ' || maze[userY][userX + 1] == '1')
+	if (maze[userY][userX + 1] == ' ')
 		numberOfExits++;
-	if (maze[userY][userX - 1] == ' ' || maze[userY][userX - 1] == '1')
+	if (maze[userY][userX - 1] == ' ')
 		numberOfExits++;
 
 	if (numberOfExits <= 2)
@@ -279,19 +265,7 @@ bool isDeadEnd(char** maze, int x, int y)
 	return false;
 }
 
-bool isNewPassage(char** maze, int x, int y)
-{
-	if (maze[y + 1][x] == ' ')
-		return true;
-	if (maze[y - 1][x] == ' ')
-		return true;
-	if (maze[y][x + 1] == ' ')
-		return true;
-	if (maze[y][x - 1] == ' ')
-		return true;
 
-	return false;
-}
 
 int numberOfExits(char** maze, int x, int y)
 {
@@ -305,54 +279,6 @@ int numberOfExits(char** maze, int x, int y)
 	if (maze[y][x - 1] == ' ' || maze[y][x - 1] == '.')
 		numberOfExits++;
 	return numberOfExits;
-}
-
-// TODO: Implement this
-void mazeSolverTremaux(char** maze, int SIZEX, int SIZEY, int userX, int userY, int goalX, int goalY)
-{
-	cout << "-------" << endl;
-	// Univisted is ' '
-	// Marked once is '1'
-	// Marked twice is '2'
-	// Junction is '*'
-
-	char dir[5] = { 'N', 'E', 'S', 'W' };
-	char currentDir = 'N';
-	int dx = getDX(currentDir), dy = getDY(currentDir);
-
-	
-
-	while (maze[userY][userX] != '$')
-	{
-		cout << "userX: " << userX << ", userY: " << userY << ", isJunction: " << isJunction(maze, userX, userY) << ", isDeadEnd: " << isDeadEnd(maze, userX, userY) << endl;
-
-		if (isJunction(maze, userX, userY))
-			maze[userY][userX] = '*';
-		else if (maze[userY][userX] == ' ')
-			maze[userY][userX] = '1';
-		else if (maze[userY][userX] == '1')
-			maze[userY][userX] == '2';
-
-
-
-		//cout << "userX: " << userX << ", userY: " << userY << ", dx: " << dx << ", dy: " << dy << endl;
-		
-		// move forward
-		userX += dx;
-		userY += dy;
-
-		//cout << "userX: " << userX << ", userY: " << userY << ", dx: " << dx << ", dy: " << dy << endl;
-		
-		// Debug information
-		/*
-		displayMaze(maze, SIZEX, SIZEY, userX, userY, goalX, goalY, 5000000);
-		cout << "userX: " << userX << ", userY: " << userY << endl;
-		cout << "currentDir: " << currentDir << endl;
-		cout << "current user position: " << maze[userY][userX] << endl;
-		cout << "--------" << endl;
-		Sleep(1000);
-		*/
-	}
 }
 
 bool isBend(char** maze, int x, int y, char currentDir)
@@ -383,7 +309,7 @@ void mazeSolverLeftHandRule(char** maze, int SIZEX, int SIZEY, int userX, int us
 		{
 			maze[userY][userX] = ' ';
 		}
-		else if (isBend(maze, userX, userY, currentDir)) // user is at a bend, 
+		else if (isBend(maze, userX, userY, currentDir)) // user is at a bend,
 		{
 			maze[userY][userX] = '.';
 		}
@@ -403,8 +329,6 @@ void mazeSolverLeftHandRule(char** maze, int SIZEX, int SIZEY, int userX, int us
 		{
 			maze[userY][userX] = '.';
 		}
-
-		//maze[userY][userX] = '.';
 
 		switch (currentDir)
 		{
@@ -450,6 +374,7 @@ void mazeSolverLeftHandRule(char** maze, int SIZEX, int SIZEY, int userX, int us
 			else if (currentDir == 'W') { currentDir = 'S'; }
 			else if (currentDir == 'S') { currentDir = 'E'; }
 			else { currentDir = 'N'; }
+
 			// Update dx,dy,wallCheckX,wallCheckY to their proper values with the new direction
 			switch (currentDir)
 			{
@@ -477,16 +402,6 @@ void mazeSolverLeftHandRule(char** maze, int SIZEX, int SIZEY, int userX, int us
 			userX += dx;
 			userY += dy;
 		}
-
-		// Debug information Below:
-		/*
-		displayMaze(maze, SIZEX, SIZEY, userX, userY, goalX, goalY, 500000);
-		cout << "userX: " << userX << ", userY: " << userY << endl;
-		cout << "goalX: " << goalX << ", goalY: " << goalY << endl;
-		cout << "current user position: " << maze[userY][userX] << endl;
-		cout << "--------" << endl;
-		Sleep(500);
-		*/
 	}
 }
 
@@ -514,8 +429,6 @@ int main()
 	int SIZEX = 0;
 	int SIZEY = 0;
 	int difficulty = 0;
-	int secretDoors = 0;
-	int doors = 0;
 	int randomUserSpawn = 0;
 	int randomGoalSpawn = 0;
 
@@ -532,13 +445,6 @@ int main()
 	cin >> randomGoalSpawn;
 	cout << "Difficulty (1 - 3x3 vision, 2 - 5x5 vision, 3 - 7x7 vision, 4 - full map): ";
 	cin >> difficulty;
-
-	/* Not implemented yet
-	cout << "Secret Doors (0 - No, 1 - Yes): ";
-	cin >> secretDoors;
-	cout << "Include locked/unlocked doors (0 - No, 1 - Yes): ";
-	cin >> doors;
-	*/
 
 	// dynamically create a 2d array
 	char** maze = new char* [SIZEY];
@@ -669,18 +575,13 @@ int main()
 						maze[i][j] = ' ';
 			break;
 
-		case 'o':
-			mazeSolverTremaux(maze, SIZEX, SIZEY, userX, userY, goalX, goalY);
-			cout << "-----------------------------" << endl;
-			cout << "The solved maze is below." << endl;
-			displayMaze(maze, SIZEX, SIZEY);
-			break;
-
 		default:
 			break;
 		}
 	}
 	
+	delete[] maze;
+
 	return 0;
 }
 
